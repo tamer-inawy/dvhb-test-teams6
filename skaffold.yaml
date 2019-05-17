@@ -1,0 +1,30 @@
+apiVersion: skaffold/v1beta2
+kind: Config
+build:
+  artifacts:
+  - image: changeme
+    context: .
+    docker: {}
+  tagPolicy:
+    envTemplate:
+      template: '{{.DOCKER_REGISTRY}}/tamer-inawy/dvhb-test-teams6:{{.VERSION}}'
+  local: {}
+deploy:
+  kubectl: {}
+profiles:
+- name: dev
+  build:
+    artifacts:
+    - docker: {}
+    tagPolicy:
+      envTemplate:
+        template: '{{.DOCKER_REGISTRY}}/tamer-inawy/dvhb-test-teams6:{{.DIGEST_HEX}}'
+    local: {}
+  deploy:
+    helm:
+      releases:
+      - name: dvhb-test-teams6
+        chartPath: charts/dvhb-test-teams6
+        setValueTemplates:
+          image.repository: '{{.DOCKER_REGISTRY}}/tamer-inawy/dvhb-test-teams6'
+          image.tag: '{{.DIGEST_HEX}}'
